@@ -1,0 +1,278 @@
+\documentclass[a4paper,11pt,reqno]{amsart}
+\title{Machine Learning for Computational Finance \\Assignment 1}
+\author{ Karthik Iyer}
+\usepackage[
+margin=25mm,
+marginparwidth=25mm,     % + <- Width of your marginpar
+marginparsep=2mm,       % + <- Gap between text block and marginpar
+bottom=25mm,
+]{geometry}
+\usepackage[colorlinks=true]{hyperref}
+\hypersetup{urlcolor=blue, citecolor=red}
+\usepackage{comment}
+\usepackage{libertine}
+\usepackage{libertinust1math}
+\usepackage[T1]{fontenc}
+\usepackage{mathtools}
+\usepackage{amssymb,amsmath,amsfonts,amscd,amsthm}
+%\usepackage[thmmarks]{ntheorem}
+%\theoremheaderfont{\bfseries}
+%\theorembodyfont{\normalfont}
+%\theoremseparator{:}
+%\theoremsymbol{$\blacksquare$}
+%\newtheorem*{proof}{Proof}
+
+\usepackage{fancybox}
+\usepackage{bbm}
+
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem*{cor}{Corollary}
+\usepackage[parfill]{parskip}
+
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}[section]
+\newtheorem{conj}{Conjecture}[section]
+\newtheorem{exmp}{Example}[section]
+\newcommand\restr[2]{{% we make the whole thing an ordinary symbol
+		\left.\kern-\nulldelimiterspace % automatically resize the bar with \right
+		#1 % the function
+		\vphantom{\big|} % pretend it's a little taller at normal size
+		\right|_{#2} % this is the delimiter
+}}
+
+\makeatletter
+\newcommand{\rmnum}[1]{\romannumeral #1}
+\newcommand{\Rmnum}[1]{\expandafter\@slowromancap\romannumeral #1@}
+\makeatother
+\renewcommand{\labelenumii}{\Roman{enumii}}
+\newcommand{\lowerromannumeral}[1]{\romannumeral#1\relax}
+\theoremstyle{remark}
+\newtheorem{rem}{Remark}
+\newtheorem*{note}{Note}
+\numberwithin{equation}{section}
+\renewcommand{\qedsymbol}{$\blacksquare$}
+\usepackage{ textcomp }
+
+
+
+\begin{document}
+% title
+%\begin{center}
+%\Large{ Karthik Iyer}
+%\end{center}
+%\vskip 8pt
+%\begin{center}
+%\Large Machine Learning for Computational Finance \hskip 3in Assignment 1\\
+%%{\bf Due: Monday October 16th, in class}.
+%\end{center}
+%=========================================================================
+% problem 1
+\maketitle
+{\it \textbf{Problem 1}: Linear Regression}
+\vskip 8pt
+Consider a quadratic function,
+\[
+f(x) = \frac{1}{2}||\mathbf{F}x - \mathbf{r}||^2.
+\]
+\begin{enumerate}
+\item What is the gradient $\nabla f$ and Hessian $\nabla^2 f$ of this function? Is $\nabla f$ Lipschitz continuous? If it is, what is the Lipschitz constant?
+\begin{proof}[Solution:] 
+	
+Let $\langle.\,,. \rangle$ denote the usual inner product in the Euclidean space. 	Before we proceed, let us state two facts.
+	\begin{enumerate}
+		\item[(i)]  For any symmetric $n \times n$ matrix $A$, if $g(x): \mathbb{R}^n \to \mathbb{R}$ is defined as $g(x) = \langle Ax, x \rangle$, then $\nabla g(x) = 2 Ax$. We can see why this is true by expanding the inner product and doing some algebra. 
+		\item[(ii)] For any $m \times n$ matrix $A$, if $h(x): \mathbb{R}^n \to \mathbb{R}$ is defined as $h(x) = \langle Ax, b \rangle$ for some $b \in \mathbb{R}^m$, then $\nabla h(x) = A^T b$. We can why this is true by expanding the inner product and doing some algebra. 
+	\end{enumerate}
+	 
+	 Now, since $f(x): \mathbb{R}^n \to \mathbb{R}$ is defined as $f(x) = \frac{1}{2} ||\mathbf{F}x - \mathbf{r}||^2$, we can re-write $f(x)$ as $f(x) = \frac{1}{2}( \langle \mathbf{F}x, \mathbf{F}x\rangle - 2 \langle \mathbf{F}x, b \rangle + ||r||^2 ) = \frac{1}{2}( \langle \mathbf{F}^T \mathbf{F}x, x \rangle - 2 \langle \mathbf{F}x, b \rangle + ||r||^2 ). $
+	 
+	 We can now invoke the two facts proved above to conclude that 
+	 $\nabla f(x) = \mathbf{F}^T(\mathbf{F} x - b)$. (Here $\mathbf{F}$ is a $m \times n $ matrix, $x \in \mathbb{R}^n$ and $b \in \mathbb{R}^m$).
+	 
+	 And hence, the Hessian $ \nabla^2 f = \mathbf{F}^T \mathbf{F}$. It is also easy to see that $\nabla f$ is Lipschitz since 
+	 \begin{align*}
+	 ||\nabla f(x) - \nabla f(y)||_{2} &= ||\mathbf{F}^T\mathbf{F} (x - y) ||_{2} \mbox{ for any } x, y \in \mathbb{R}^n \notag \\
+	 & \leq ||\mathbf{F}^T\mathbf{F}||_{2} ||x - y||_{2} \mbox{ (By definition of matrix 2-norm)}	 
+	 \end{align*}
+	 Thus, $\nabla f$ is Lipschitz continuous with Lipschitz constant $||\mathbf{F}^T\mathbf{F}||_{2} = ||\mathbf{F}||_2^2$.
+	 
+	 (Note to self: Recall that the singular values of a $m \times n$ matrix $X$ are the square roots of the eigenvalues of the $n \times n$ matrix X*X (where * stands for the transpose-conjugate matrix if it has complex coefficients, or the transpose if it has real coefficients). Thus, if $X$ is $n \times n$ real symmetric matrix with non-negative eigenvalues, then eigenvalues and singular values coincide, but it is not generally the case).
+	\end{proof}
+% solution
+\vskip 16pt
+\item If we add a quadratic penalty to the function, $f(x) = \frac{1}{2}||\mathbf{F}x - \mathbf{r}||^2 + \frac{\lambda}{2}||x||^2$. Answer the same set of questions in part (1) for this $f$.
+\begin{proof}[Solution:] We proceed as in part (1) to get 
+	$\nabla f(x) = \mathbf{F}^T(\mathbf{F} x - b) + \lambda x$ and $\nabla ^2 f(x) =  \mathbf{F}^T\mathbf{F} + \lambda I_{n \times n}$. In this case too,
+	$\nabla f(x)$ is Lipschitz with Lipschitz constant $||\mathbf{F}||_2^2 + \lambda$.
+	\end{proof}
+\vskip 16pt
+\item Implement gradient descent algorithm in \textbf{Jupyter Notebook} to solve the problem,
+\[
+\min_x \frac{1}{2}||\mathbf{F}x - \mathbf{r}||^2 + \frac{\lambda}{2}||x||^2.
+\]
+\end{enumerate}
+%=========================================================================
+% problem 2
+\vskip 16pt \noindent
+{\it \textbf{Problem 2}: LASSO}
+\vskip 8pt
+Consider LASSO objective,
+\[
+\min_x f(x) := \frac{1}{2}||\mathbf{F}x - \mathbf{r}||^2 + \lambda||x||_1.
+\]
+\begin{enumerate}
+\item Is $f$ a $\beta$-smooth function? If it is,  what is $\beta$? If not explain the reasons.
+\begin{proof}[Solution:] $f$ is not a $\beta$- smooth function for any $\beta >0$. Had it been so, then since $\frac{1}{2}||\mathbf{F}x - \mathbf{r}||^2$ is $\beta$ smooth for $\beta = \sigma_1$, $||x||_1$ will also be $\beta^{'}$ smooth for some $\beta^{'}$. But $||x||_{1}$ is not $C^{1}$.
+	\end{proof}
+\vskip 16pt
+\item Consider a simpler version of the problem,
+\[
+\min_x \frac{1}{2\eta}||x - y||^2 + \lambda||x||_1
+\]
+what is the solution (in closed form)?
+% solution
+\begin{proof}[Solution:] We wish to minimize $\frac{1}{2\eta}||x - y||^2_2 + \lambda ||x||_1$. Note that 
+	\begin{align}
+	&min_{x}\; \frac{1}{2\eta} ||y - x||^2_2 + \lambda||x||_1 \notag \\
+	& = min_{x}\; \frac{1}{2\eta}[ ||y||^2 + ||x||^2 - 2 \langle x, y \rangle] + \lambda||x||_1 \notag \\
+	& = min_{x} \frac{1}{2\eta}[||x||^2 - 2 \langle x, y \rangle] + \lambda||x||_1 \mbox{ as y is independent of x } \notag \\
+	&=  min_{x} \frac{1}{2\eta}[ \sum_{i} x_i^2 - 2x_iy_i] + \lambda \sum_{i} |x_i| \notag \\	
+	&= min_{x} \frac{1}{\eta} \left[\sum_{i} \left(\frac{x_i^2}{2} - x_iy_i + \lambda \eta |x_i|\right)\right]. 
+	\end{align}
+	Note that we can minimize each term inside the sum separately as the terms are essentially independent from each other. Consider the problem of minimizing 
+	$L_i(x_i) = \left(\frac{x_i^2}{2} - x_iy_i + \lambda \eta |x_i|\right)$. 
+	
+	Note that if $y_i > 0$, then $x_i \geq 0$ ( for if $x_i <0$; then $L_i \geq 0 = L_i(0)$. Similarly, if $y_i < 0$, then $x_i \leq 0$. 
+	
+	If $y_i > 0$; then since $x_i \geq 0$, $L_i = \frac{x_i^2}{2} - x_iy_i + \lambda \eta x_i$. Minimizing this quantity (by setting the first derivative to $0$) gives us $x_i = y_i - \lambda \eta$. Since this is feasible only when $x_i \geq 0$ and $y_i > 0$, we get $x_i = sgn(y_i)(|y_i| - \lambda\eta)^{+}$. 
+	
+	If If $y_i \leq 0$; then since $x_i \leq 0$, $L_i = \frac{x_i^2}{2} - x_iy_i - \lambda \eta x_i$. Minimizing this quantity (by setting the first derivative to $0$) gives us $x_i = y_i + \lambda \eta$. Since this is feasible only when $x_i \leq 0$ and $y_i < 0$, we get $x_i = sgn(y_i)(|y_i| - \lambda\eta)^{+}$. 
+	
+	Thus in both cases we obtain $x_i = sgn(y_i)(|y_i| - \lambda\eta)^{+}$. Hence the desired minimizer is 
+\[
+x = (x_1,...,x_n) \mbox{ where }x_i = sgn(y_i)(|y_i| - \lambda\eta)^{+}.
+\]
+	\end{proof}
+\vskip 16pt
+\item Implement proximal gradient descent algorithm in \textbf{Jupyter Notebook}.
+\end{enumerate}
+%=========================================================================
+% problem 3
+\vskip 16pt \noindent
+{\it \textbf{Problem 3}: Robust Regression}
+\vskip 8pt
+Consider Huber objective,
+\[
+\min_x f(x):=\rho_\kappa(\mathbf{F}x - \mathbf{r}) + \lambda||x||_1
+\]
+where $\rho_\kappa$ is Huber function,
+\[
+\rho_\kappa(a) = \sum_{i=1}^m\begin{cases}
+\kappa|a_i| - \kappa^2/2,&|a_i| > \kappa\\
+a_i^2/2,&|a_i| \le \kappa
+\end{cases}
+\]
+\begin{enumerate}
+\item For scalar case $a\in\mathbb{R}$, show that $\rho_\kappa(a) = \min_x \frac{1}{2}(x-a)^2+\kappa|x|$. (Same derivation with Problem 2 (2)).
+% solution
+\begin{proof}
+	Let $p_\kappa(a) = \min_x \frac{1}{2}(x-a)^2+\kappa|x|$. By Problem 2 part (2) we obtain 
+	$p_{\kappa}(a) = \frac{1}{2}([sgn(a)(|a| - \kappa)^{+} - a] ^2 + \kappa (| |a| - \kappa|)^{+}$. 
+	For $|a| \geq \kappa$; we get 
+	\[ p_{\kappa}(a) = \frac{1}{2}\kappa^2 + \kappa |a - sgn(a) \kappa| \\
+	 =  \frac{1}{2}\kappa^2 + \kappa |\;|a| -\kappa| = \kappa |a| - \frac{1}{2} \kappa^2.
+	 \]
+	 For $|a| < \kappa$, we get $p_{\kappa}(a) = \frac{a^2}{2}$. This agrees with the definition of $\rho_{\kappa}(a)$. 
+	\end{proof}
+\vskip 16pt
+\item Is $\rho_\kappa$ a $\beta$-smooth function? If it is what is $\beta$?
+\begin{proof}[Solution:] Yes. It is easy to see that $\rho_{\kappa}$ is $C^1$. (As $|.|$  is smooth away from $0$ and since  
+		\[
+		\frac{\partial \rho_{\kappa}}{\partial a_i}(a) = \begin{cases}
+		\kappa sgn(a_i) ,&|a_i| > \kappa\\
+		a_i,&|a_i| \le \kappa
+		\end{cases}
+		\]
+		is continuous).
+		
+		We claim that $\big |\frac{\partial \rho_{\kappa}}{\partial a_i}(y) - \frac{\partial \rho_{\kappa}}{\partial a_i}(x) \big | \leq |y_i - x_i|$. 
+		
+		To prove this, we assume without loss of generality that $y_i > x_i$ and consider the following 6 mutually exhaustive cases: 
+		
+		\begin{enumerate}
+			\item [Case 1:] $y_i \geq \kappa > x_i > - \kappa$. 
+			In this case, $\big |\frac{\partial \rho_{\kappa}}{\partial a_i}(y) - \frac{\partial \rho_{\kappa}}{\partial a_i}(x)\big | = |\kappa - x_i | = \kappa - x_i \leq y_i - x_i  = |y_i - x_i|$.
+			
+			\item[Case 2:] $y_i \geq \kappa > - \kappa  \geq x_i$. 
+			In this case, $\big |\frac{\partial \rho_{\kappa}}{\partial a_i}(y) - \frac{\partial \rho_{\kappa}}{\partial a_i}(x)\big | = \kappa + \kappa  \leq y_i - x_i  = |y_i - x_i|$.
+			
+			\item[Case 3:] $y_i > x \geq \kappa$. 
+			In this case, $\big |\frac{\partial \rho_{\kappa}}{\partial a_i}(y) - \frac{\partial \rho_{\kappa}}{\partial a_i}(x)\big | = 0  \leq y_i - x_i  = |y_i - x_i|$.
+			
+			\item[Case 4:] $\kappa \geq y_i > x_i \geq - \kappa$. 
+			In this case, $\big |\frac{\partial \rho_{\kappa}}{\partial a_i}(y) - \frac{\partial \rho_{\kappa}}{\partial a_i}(x)\big | = y_i - x_i \leq |y_i - x_i|$.
+			
+			\item[Case 5:] $\kappa \geq y_i > - \kappa \geq x_i$. 
+			In this case, $\big |\frac{\partial \rho_{\kappa}}{\partial a_i}(y) - \frac{\partial \rho_{\kappa}}{\partial a_i}(x)\big | = y_i + \kappa \leq y_i - x_i = |y_i - x_i|$.
+			
+			\item[Case 6:] $- \kappa \geq y_i > x_i$. 
+			In this case, $\big |\frac{\partial \rho_{\kappa}}{\partial a_i}(y) - \frac{\partial \rho_{\kappa}}{\partial a_i}(x)\big | = 0 \leq |y_i - x_i|$.
+			\end{enumerate}
+		Our claim is hence justified. This claim in particular proves that $\rho_\kappa$ is $\beta$ smooth with $\beta = 1$. 
+	\end{proof}
+% solution
+\vskip 16pt
+\item Is $\rho_\kappa(\mathbf{F}x - \mathbf{r})$ a $\beta$-smooth function with respect to $x$? If it is what is $\beta$?
+\begin{proof}
+	Yes. Firstly, the composition of two $C^1$ functions is $C^1$. Moreover, by chain rule and the fact that $\rho_{\kappa}(a)$ is $1$ smooth, we see that by chain rule, 
+that for $h(x) = \rho_\kappa(\mathbf{F}x - \mathbf{r})$, $\nabla h(x) = \mathbf{F}^T \nabla \rho_\kappa(\mathbf{F}x - \mathbf{r})$. Hence
+\[
+||\nabla h(x) - \nabla h(y)||_2  \leq ||\mathbf{F}^T||_2 ||\mathbf{F}||_2 ||x-y||_2.
+\]
+
+Thus $\rho_\kappa(\mathbf{F}x - \mathbf{r})$ is $||\mathbf{F}||^2_2$ smooth.
+	\end{proof}
+% solution
+\vskip 16pt
+\item Implement proximal gradient descent method in \textbf{Jupyter Notebook}.
+\end{enumerate}
+%=========================================================================
+% problem 4
+\vskip 16pt \noindent
+{\it \textbf{Problem 4}: Logistic Regression}
+\vskip 8pt
+Assume we only care about distinguishing assets that will go up or go down, consider logistic regression objective,
+\[
+\min_{x} f(x):= \sum_{i=1}^m\{\log(1 + \exp(\langle f^i,x \rangle)) - s^i\langle f^i,x \rangle\} + \frac{\lambda}{2}||x||^2
+\]
+where $s^i\in\{-1,1\}$, is the indicator of if the asset will go up or go down. Let's also denote $\mathbf{F} = [f^1, \ldots, f^m]^T$ as we do in the note.
+\vskip 8pt
+\begin{enumerate}
+\item Calculate the gradient of $f$, namely $\nabla f$. Is $f$ a $\beta$-smooth function? If it is, what is the $\beta$?
+% solution
+\begin{proof}[Solution:]
+We note that $\frac{\partial f}{\partial x_j} =  \sum_{i = 1}^m \left(\frac{f^i_j exp \langle f^i,\; x \rangle}{1 + exp \langle f^i,\;x \rangle} - s^i f^i_j \right) + \lambda x_j$ for $j = 1, 2,...,n$.
+
+
+Let $r = \mathbf{F}x$. Note that $\mathbf{F} \in \mathcal{M}_{m \times n}$ and $x \in \mathbb{R}^n$. Let $r = (r_1, r_2, ..., r_m)$. Define $exp(r) = (exp(r_1), exp(r_2),...,exp(r_m))$.
+
+\begin{align}
+\nabla f(x)  = \mathbf{F}^T \left(\frac{1}{1 + exp(-r)} - s\right) + \lambda x,
+\end{align}
+where $\frac{1}{1 + exp(r)}$ is gotten by componentwise operations. 
+
+After some algebraic manipulations, we can bound $|| \nabla ^  2 \mathbf{f}|| \leq ||\mathbf{F}||_2^2 + \lambda$. 
+Thus, $f$ is $\beta $ smooth with $\beta =  ||\mathbf{F}||_2^2 + \lambda$. (Note that this is the same $\beta$ as we had for OLS regression. I am not sure if this is the optimal $\beta$ though.)
+
+\end{proof}
+
+\vskip 16pt
+\item Implement gradient descent method in \textbf{Jupyter Notebook} over training data.
+Do cross validation to the best $\lambda$, and report the test error.
+
+\begin{proof}[Solution:]The test error turns out to be 47.2 \%.\end{proof}
+\end{enumerate}
+\end{document}  
